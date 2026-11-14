@@ -16,10 +16,13 @@ import json
 import os
 import smtplib
 import sys
+import threading
 import urllib.request
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
+
+_DISPATCH_LOCK = threading.Lock()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE = PROJECT_ROOT / ".env"
@@ -104,52 +107,53 @@ def send_social_webhook(webhook_url: str, subject: str, body: str) -> None:
 
 
 def dispatch_due_jobs() -> dict:
-    database.init_db()
-    cfg = load_env_file()
-    status = get_autopilot_status()
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    pending = database.list_outbox_jobs(status="pending")
+    with _DISPATCH_LOCK:
+        database.init_db()
+        cfg = load_env_file()
+        status = get_autopilot_status()
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        pending = database.list_outbox_jobs(status="pending")
 
-    sent_count = 0
-    skipped_no_creds = 0
-    failed_count = 0
-    future_count = 0
+        sent_count = 0
+        skipped_no_creds = 0
+        failed_count = 0
+        future_count = 0
 
-    for job in pending:
-        if job["scheduled_for"] > now_str:
-            future_count += 1
-            continue
-        ch = job["channel"]
-        if ch == "email":
-            if not status["smtp_ready"]:
-                skipped_no_creds += 1
+        for job in pending:
+            if job["scheduled_for"] > now_str:
+                future_count += 1
                 continue
-            try:
-                send_smtp_email(cfg, job["recipient"], job["subject"], job["body"])
-                database.update_outbox_job(job["id"], "sent")
-                sent_count += 1
-            except Exception as exc:
-                database.update_outbox_job(job["id"], "failed", str(exc))
-                failed_count += 1
-        elif ch == "social_webhook":
-            if not status["social_webhook_ready"]:
-                skipped_no_creds += 1
-                continue
-            try:
-                send_social_webhook(cfg["SOCIAL_WEBHOOK_URL"], job["subject"], job["body"])
-                database.update_outbox_job(job["id"], "sent")
-                sent_count += 1
-            except Exception as exc:
-                database.update_outbox_job(job["id"], "failed", str(exc))
-                failed_count += 1
+            ch = job["channel"]
+            if ch == "email":
+                if not status["smtp_ready"]:
+                    skipped_no_creds += 1
+                    continue
+                try:
+                    send_smtp_email(cfg, job["recipient"], job["subject"], job["body"])
+                    database.update_outbox_job(job["id"], "sent")
+                    sent_count += 1
+                except Exception as exc:
+                    database.update_outbox_job(job["id"], "failed", str(exc))
+                    failed_count += 1
+            elif ch == "social_webhook":
+                if not status["social_webhook_ready"]:
+                    skipped_no_creds += 1
+                    continue
+                try:
+                    send_social_webhook(cfg["SOCIAL_WEBHOOK_URL"], job["subject"], job["body"])
+                    database.update_outbox_job(job["id"], "sent")
+                    sent_count += 1
+                except Exception as exc:
+                    database.update_outbox_job(job["id"], "failed", str(exc))
+                    failed_count += 1
 
-    return {
-        "config_status": status,
-        "sent": sent_count,
-        "skipped_missing_credentials": skipped_no_creds,
-        "failed": failed_count,
-        "scheduled_for_later": future_count,
-    }
+        return {
+            "config_status": status,
+            "sent": sent_count,
+            "skipped_missing_credentials": skipped_no_creds,
+            "failed": failed_count,
+            "scheduled_for_later": future_count,
+        }
 
 
 def main() -> None:

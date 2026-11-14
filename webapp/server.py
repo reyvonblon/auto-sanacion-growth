@@ -11,6 +11,8 @@ import os
 import re
 import sys
 import tempfile
+import threading
+import time
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -471,16 +473,37 @@ def create_server(host: str = "127.0.0.1", port: int = 8795) -> ThreadingHTTPSer
     return ThreadingHTTPServer((host, port), AutoSanacionHandler)
 
 
+def _start_autopilot_worker(interval_seconds: int) -> threading.Event:
+    stop_event = threading.Event()
+
+    def _loop() -> None:
+        while not stop_event.wait(interval_seconds):
+            try:
+                status = autopilot_dispatcher.get_autopilot_status()
+                if status.get("smtp_ready") or status.get("social_webhook_ready"):
+                    autopilot_dispatcher.dispatch_due_jobs()
+            except Exception:
+                pass
+
+    thread = threading.Thread(target=_loop, name="autopilot-worker", daemon=True)
+    thread.start()
+    return stop_event
+
+
 def main() -> None:
     host = os.environ.get("AUTOSANACION_HOST", "127.0.0.1")
-    port = int(os.environ.get("AUTOSANACION_PORT", "8795"))
+    port = int(os.environ.get("PORT") or os.environ.get("AUTOSANACION_PORT", "8795"))
     server = create_server(host=host, port=port)
+    dispatch_interval = int(os.environ.get("AUTOSANACION_DISPATCH_INTERVAL", "60"))
+    stop_event = _start_autopilot_worker(dispatch_interval) if dispatch_interval > 0 else None
     print(f"Auto Sanación Studio escuchando en http://{host}:{port}", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
+        if stop_event is not None:
+            stop_event.set()
         server.server_close()
 
 
