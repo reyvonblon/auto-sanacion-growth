@@ -25,6 +25,8 @@ class TestWebAppIntegration(unittest.TestCase):
         self.db_path = Path(self.tmp_dir.name) / "test.db"
         os.environ["AUTOSANACION_DB_PATH"] = str(self.db_path)
         os.environ["AUTOSANACION_QUIET"] = "1"
+        self.orig_env_file = server.autopilot_dispatcher.ENV_FILE
+        server.autopilot_dispatcher.ENV_FILE = Path(self.tmp_dir.name) / ".env.missing"
         server.LATEST_OUTPUT_DIR = Path(self.tmp_dir.name) / "latest_cycle"
         self.httpd = server.create_server(host="127.0.0.1", port=0)
         self.port = self.httpd.server_address[1]
@@ -35,6 +37,7 @@ class TestWebAppIntegration(unittest.TestCase):
         self.httpd.shutdown()
         self.httpd.server_close()
         self.thread.join(timeout=2)
+        server.autopilot_dispatcher.ENV_FILE = self.orig_env_file
         os.environ.pop("AUTOSANACION_DB_PATH", None)
         self.tmp_dir.cleanup()
 

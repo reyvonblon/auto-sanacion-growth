@@ -45,6 +45,7 @@ def load_env_file() -> dict[str, str]:
         "SMTP_USER",
         "SMTP_PASS",
         "SMTP_FROM",
+        "SMTP_REPLY_TO",
         "SOCIAL_WEBHOOK_URL",
     ):
         if os.environ.get(k):
@@ -62,6 +63,8 @@ def get_autopilot_status() -> dict[str, bool]:
 def send_smtp_email(cfg: dict[str, str], to_addr: str, subject: str, body: str) -> None:
     msg = EmailMessage()
     msg["From"] = cfg.get("SMTP_FROM") or cfg["SMTP_USER"]
+    if cfg.get("SMTP_REPLY_TO"):
+        msg["Reply-To"] = cfg["SMTP_REPLY_TO"]
     msg["To"] = to_addr
     msg["Subject"] = subject
     msg.set_content(body)
