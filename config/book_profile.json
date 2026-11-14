@@ -1,0 +1,50 @@
+{
+  "book": {
+    "title": "AUTO SANACIÓN: Descubre como tu cuerpo tiene los recursos para sanar",
+    "short_title": "Auto Sanación",
+    "author": "Francis Jaramillo",
+    "author_full_name": "Francis Andrea Jaramillo Jacded",
+    "author_credentials": "Psicóloga, terapeuta en medicina integrativa, consejera y especialista en teoterapia familiar",
+    "publisher": "Independently published",
+    "isbn13_paperback": "979-8403609579",
+    "formats": ["Kindle", "Tapa blanda (Paperback)", "Audiolibro (Audible)"],
+    "language": "es",
+    "asin_kindle": "B09QN8HTQQ",
+    "asin_paperback": "B09QN8HTQQ",
+    "asin_english": "B09XZHFXDK",
+    "asin_audible": "B0D2MMD456",
+    "core_premise": "El ser humano posee recursos biológicos, emocionales y espirituales intrínsecos para activar su autosanación y recuperar el bienestar integral (cuerpo, mente y alma).",
+    "origin_story": "Guía práctica y testimonio personal basado en la experiencia de la autora tras enfrentar un diagnóstico de cáncer durante su embarazo y elegir un camino integrativo de sanación física, mental y espiritual.",
+    "target_audiences": [
+      "Personas que buscan sanación emocional, mental y bienestar integral",
+      "Lectores interesados en psicologia integrativa, conexión mente-cuerpo y psiconeuroinmunología",
+      "Pacientes o familiares que atraviesan procesos de salud difíciles buscando esperanza y herramientas prácticas",
+      "Mujeres y madres interesadas en crecimiento personal, fe, resiliencia y salud holística"
+    ],
+    "differentiators": [
+      "Autora psicóloga y terapeuta integrativa con respaldo profesional y vivencia real extrema",
+      "Historia real de superación de cáncer durante el embarazo",
+      "Enfoque práctico cuerpo-mente-alma en español"
+    ]
+  },
+  "amazon_strategy": {
+    "primary_marketplaces": ["Amazon.com (US Hispanic)", "Amazon.es", "Amazon.com.mx"],
+    "kdp_select_enrolled": null,
+    "has_aplus_content": null,
+    "has_author_central": null,
+    "target_acos_percent": 35.0,
+    "break_even_acos_percent": 55.0,
+    "default_daily_ads_budget_usd": 3.0,
+    "monthly_ads_budget_cap_usd": 100.0,
+    "amazon_attribution_tags": {}
+  },
+  "channels": {
+    "whatsapp": "+14845238204",
+    "email": "francisjaramilloautora@gmail.com",
+    "instagram": "PENDIENTE_COMPLETAR",
+    "tiktok": "PENDIENTE_COMPLETAR",
+    "youtube": "PENDIENTE_COMPLETAR",
+    "website": "PENDIENTE_COMPLETAR",
+    "email_provider": "Gmail SMTP (francisjaramilloautora@gmail.com)"
+  }
+}

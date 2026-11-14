@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escuela Auto Sanación — Tu Proceso Paso a Paso</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-badge">AS</span>
+        <span>Escuela Auto Sanación</span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-link" href="/">Libro en Amazon</a>
+        <a class="nav-link active" href="/escuela">Mis Clases</a>
+        <a class="nav-link" href="/admin">Panel de Francis</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <section class="card" style="margin-bottom: 24px;">
+      <div class="grid-2" style="align-items: center;">
+        <div>
+          <span class="pill">Columna Vertebral: Libro + Clases + Acompañamiento</span>
+          <h1 style="margin-bottom: 8px;">Tu Camino en Auto Sanación</h1>
+          <p id="welcome-msg" class="muted" style="margin-bottom: 14px;"></p>
+          <div class="progress-track" aria-label="Progreso total">
+            <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+          </div>
+          <p id="progress-text" style="font-weight: 700; margin-top: 8px;">0 de 0 lecciones completadas</p>
+        </div>
+        <div class="card-soft">
+          <h3 style="margin-bottom: 10px;">Identifícate para guardar tu avance</h3>
+          <form id="student-login-form">
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="st-name">Tu nombre</label>
+                <input id="st-name" type="text" required placeholder="Ej. Laura Pérez" />
+              </div>
+              <div class="form-group">
+                <label for="st-email">Tu correo</label>
+                <input id="st-email" type="email" required placeholder="laura@correo.com" />
+              </div>
+            </div>
+            <div class="btn-row">
+              <button type="submit" class="btn btn-primary">Cargar / Guardar mi perfil</button>
+              <a id="escuela-wa" class="btn btn-whatsapp" target="_blank" rel="noopener" href="#">Consultar a Francis</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div id="school-modules"></div>
+  </main>
+
+  <script src="/static/common.js"></script>
+  <script>
+    let curriculum = [];
+    let progressMap = {};
+
+    function getStudent() {
+      return {
+        email: (localStorage.getItem("autosanacion_student_email") || "").trim().toLowerCase(),
+        name: (localStorage.getItem("autosanacion_student_name") || "").trim(),
+      };
+    }
+
+    async function loadSchool() {
+      const [cfg, school] = await Promise.all([apiRequest("/api/config"), apiRequest("/api/school")]);
+      document.getElementById("welcome-msg").textContent = cfg.settings.school_welcome_message || "";
+      document.getElementById("escuela-wa").href = cfg.whatsapp_direct_url;
+      curriculum = school.modules;
+
+      const st = getStudent();
+      if (st.email) {
+        document.getElementById("st-email").value = st.email;
+        document.getElementById("st-name").value = st.name;
+        await refreshProgress(st.email);
+      } else {
+        renderModules();
+      }
+    }
+
+    async function refreshProgress(email) {
+      const data = await apiRequest(`/api/student/progress?email=${encodeURIComponent(email)}`);
+      progressMap = {};
+      for (const item of data.items || []) {
+        progressMap[item.lesson_id] = item;
+      }
+      if (data.lead && data.lead.name) {
+        localStorage.setItem("autosanacion_student_name", data.lead.name);
+        document.getElementById("st-name").value = data.lead.name;
+      }
+      renderModules();
+    }
+
+    function renderModules() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const focusModule = Number(urlParams.get("module") || "0");
+      let totalLessons = 0;
+      let doneLessons = 0;
+
+      const html = curriculum
+        .map((mod) => {
+          const lessonsHtml = (mod.lessons || [])
+            .map((lesson) => {
+              totalLessons += 1;
+              const prog = progressMap[lesson.id] || {};
+              const isDone = Boolean(prog.completed);
+              if (isDone) doneLessons += 1;
+              const embed = toEmbedUrl(lesson.video_url);
+
+              return `
+              <div class="card-soft" style="margin-top: 14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                  <h3 style="margin:0;">${escapeHtml(lesson.title)} (${lesson.duration_minutes} min)</h3>
+                  <span class="status-badge ${isDone ? "status-ok" : "status-warn"}">
+                    ${isDone ? "Completada" : "Pendiente"}
+                  </span>
+                </div>
+                ${
+                  embed
+                    ? `<div style="margin:14px 0;"><iframe class="video-frame" src="${escapeHtml(embed)}" allowfullscreen title="${escapeHtml(lesson.title)}"></iframe></div>`
+                    : `<p class="muted" style="margin:10px 0;"><em>Clase guiada basada en el libro (video listo para enlazar desde el Panel de Francis).</em></p>`
+                }
+                <p><strong>Lectura base en el libro:</strong> ${escapeHtml(lesson.reading_guide)}</p>
+                <p><strong>Ejercicio de profundización:</strong> ${escapeHtml(lesson.exercise_prompt)}</p>
+                <div class="form-group">
+                  <label for="refl-${lesson.id}">Tu reflexión / avance personal (lo lee Francis para acompañarte):</label>
+                  <textarea id="refl-${lesson.id}" placeholder="Escribe aquí tu aprendizaje o pregunta...">${escapeHtml(prog.reflection_text || "")}</textarea>
+                </div>
+                ${
+                  prog.francis_feedback
+                    ? `<div class="card" style="background: var(--ok-bg); margin-bottom: 12px; padding: 14px;">
+                        <strong>Respuesta de Francis Jaramillo:</strong><br/>${escapeHtml(prog.francis_feedback)}
+                       </div>`
+                    : ""
+                }
+                <div class="btn-row">
+                  <button class="btn btn-primary" type="button" onclick="saveLesson(${lesson.id}, true)">
+                    Guardar y Marcar Completada
+                  </button>
+                  <button class="btn btn-outline" type="button" onclick="saveLesson(${lesson.id}, false)">
+                    Solo guardar borrador
+                  </button>
+                </div>
+              </div>
+            `;
+            })
+            .join("");
+
+          const highlight = focusModule === mod.id ? "border: 2px solid var(--accent);" : "";
+          return `
+          <section class="card" style="margin-bottom: 22px; ${highlight}" id="module-${mod.id}">
+            <span class="status-badge status-ok">${escapeHtml(mod.chapter_ref)}</span>
+            <h2 style="margin-top: 8px;">${escapeHtml(mod.title)}</h2>
+            <p class="muted" style="margin-top: 0;">${escapeHtml(mod.subtitle)} — ${escapeHtml(mod.description)}</p>
+            ${lessonsHtml}
+          </section>
+        `;
+        })
+        .join("");
+
+      document.getElementById("school-modules").innerHTML = html;
+      const pct = totalLessons ? Math.round((doneLessons / totalLessons) * 100) : 0;
+      document.getElementById("progress-fill").style.width = `${pct}%`;
+      document.getElementById("progress-text").textContent = `${doneLessons} de ${totalLessons} lecciones completadas (${pct}%)`;
+    }
+
+    async function saveLesson(lessonId, completed) {
+      const email = document.getElementById("st-email").value.trim().toLowerCase();
+      const name = document.getElementById("st-name").value.trim();
+      if (!email) {
+        showToast("Primero ingresa tu nombre y correo arriba para guardar tu avance.");
+        document.getElementById("st-email").focus();
+        return;
+      }
+      localStorage.setItem("autosanacion_student_email", email);
+      localStorage.setItem("autosanacion_student_name", name);
+      const reflection = document.getElementById(`refl-${lessonId}`).value;
+      try {
+        await apiRequest("/api/student/progress", {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            name,
+            lesson_id: lessonId,
+            completed,
+            reflection_text: reflection,
+          }),
+        });
+        await refreshProgress(email);
+        showToast(completed ? "¡Lección completada y enviada a Francis!" : "Borrador guardado.");
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    document.getElementById("student-login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("st-name").value.trim();
+      const email = document.getElementById("st-email").value.trim().toLowerCase();
+      try {
+        await apiRequest("/api/leads", {
+          method: "POST",
+          body: JSON.stringify({ name, email, source: "escuela", stage: "en_escuela" }),
+        });
+        localStorage.setItem("autosanacion_student_email", email);
+        localStorage.setItem("autosanacion_student_name", name);
+        await refreshProgress(email);
+        showToast("Perfil cargado correctamente.");
+      } catch (err) {
+        showToast(err.message);
+      }
+    });
+
+    loadSchool().catch((err) => showToast(err.message));
+  </script>
+</body>
+</html>

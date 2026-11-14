@@ -1,0 +1,7 @@
+.env
+data/*.db
+data/*.log
+data/Auto Sanacion.app/
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,84 @@
+{
+  "spec_version": "1.2-bilingual-100usd",
+  "book": {
+    "title": "AUTO SANACIÓN / SELF-HEALING",
+    "author": "Francis Jaramillo",
+    "isbn13_paperback": "979-8403609579",
+    "asin_spanish": "B09QN8HTQQ",
+    "asin_english": "B09XZHFXDK",
+    "asin_audible": "B0D2MMD456"
+  },
+  "guardrails": {
+    "primary_marketplaces": ["Amazon.com"],
+    "target_acos_percent": 30.0,
+    "break_even_acos_percent": 50.0,
+    "total_daily_budget_usd": 3.0,
+    "monthly_cap_usd": 100.0
+  },
+  "campaigns": [
+    {
+      "name": "SP_ES_AutoSanacion_Exact",
+      "targeting_type": "MANUAL",
+      "state": "enabled",
+      "daily_budget": 1.25,
+      "start_date": "",
+      "ad_groups": [
+        {
+          "name": "AG_ES_Exact_LowBid",
+          "default_bid": 0.18,
+          "product_ad_asins": ["B09QN8HTQQ"],
+          "keywords": [
+            { "text": "autosanacion libro", "match_type": "exact", "bid": 0.22 },
+            { "text": "auto sanacion", "match_type": "exact", "bid": 0.20 },
+            { "text": "sanacion emocional libro", "match_type": "exact", "bid": 0.20 },
+            { "text": "libros de autosanacion en espanol", "match_type": "exact", "bid": 0.20 },
+            { "text": "sanar cuerpo y mente", "match_type": "exact", "bid": 0.18 },
+            { "text": "psiconeuroinmunologia libro", "match_type": "exact", "bid": 0.18 },
+            { "text": "superar el cancer libro", "match_type": "exact", "bid": 0.18 },
+            { "text": "sanacion holistica libro", "match_type": "exact", "bid": 0.16 },
+            { "text": "medicina integrativa libro", "match_type": "exact", "bid": 0.16 },
+            { "text": "psicologia integrativa", "match_type": "exact", "bid": 0.15 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SP_EN_SelfHealing_Exact",
+      "targeting_type": "MANUAL",
+      "state": "enabled",
+      "daily_budget": 1.15,
+      "start_date": "",
+      "ad_groups": [
+        {
+          "name": "AG_EN_Exact_LowBid",
+          "default_bid": 0.18,
+          "product_ad_asins": ["B09XZHFXDK"],
+          "keywords": [
+            { "text": "self healing book", "match_type": "exact", "bid": 0.22 },
+            { "text": "body resources to heal", "match_type": "exact", "bid": 0.20 },
+            { "text": "mind body healing book", "match_type": "exact", "bid": 0.20 },
+            { "text": "holistic emotional healing book", "match_type": "exact", "bid": 0.18 },
+            { "text": "psychoneuroimmunology book", "match_type": "exact", "bid": 0.18 },
+            { "text": "integrative medicine self healing", "match_type": "exact", "bid": 0.18 },
+            { "text": "healing cancer naturally book", "match_type": "exact", "bid": 0.18 },
+            { "text": "emotional resilience book", "match_type": "exact", "bid": 0.16 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SP_ES_Auto_LowBid",
+      "targeting_type": "AUTO",
+      "state": "enabled",
+      "daily_budget": 0.60,
+      "start_date": "",
+      "ad_groups": [
+        {
+          "name": "AG_ES_Auto_Discovery",
+          "default_bid": 0.13,
+          "product_ad_asins": ["B09QN8HTQQ"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto Sanación — Panel de Francis</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="admin-mode">
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/admin">
+        <span class="brand-badge">FJ</span>
+        <span>Auto Sanación · Francis Jaramillo</span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-link" href="/escuela" target="_blank">Ver la Escuela</a>
+        <a class="nav-link" href="/" target="_blank">Ver Página del Libro</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h1>Hola, Francis</h1>
+    <p class="subtitle">
+      Aquí puedes acompañar a las personas que leen tu libro y hacen tus clases. No necesitas copiar enlaces ni manejar redes sociales.
+    </p>
+
+    <div class="grid-3" style="margin-bottom: 24px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Mensajes por responder</div>
+        <div id="kpi-pending" class="kpi-value">0</div>
+        <div id="kpi-students" class="kpi-sub">Alumnos en tu Escuela: 0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Personas interesadas</div>
+        <div id="kpi-leads" class="kpi-value">0</div>
+        <div id="kpi-leads-today" class="kpi-sub">Nuevas hoy: 0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Libros vendidos</div>
+        <div id="kpi-units" class="kpi-value">0</div>
+        <div id="kpi-royalty" class="kpi-sub">Ingresos acumulados: $0.00</div>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Menú principal de Francis">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="tab-alumnos">1. Responder a tus Alumnos</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-personas">2. Personas y Ventas</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-clases">3. Tus Clases del Libro</button>
+    </div>
+
+    <!-- TAB 1: RESPONDER A TUS ALUMNOS -->
+    <section id="tab-alumnos" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <h2>Lo que han escrito tus lectores en la Escuela</h2>
+        <p class="muted">
+          Lee la reflexión de cada persona, escríbele un mensaje de guía y haz clic en <strong>Guardar mi respuesta</strong>. Ella lo verá apenas entre a su clase.
+        </p>
+        <div id="reflections-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: PERSONAS Y VENTAS -->
+    <section id="tab-personas" class="tab-panel" role="tabpanel" hidden>
+      <div class="card" style="margin-bottom: 22px;">
+        <h2>Personas que se han registrado</h2>
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="lead-search">Buscar una persona por nombre</label>
+            <input id="lead-search" type="search" placeholder="Escribe un nombre..." />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="lead-filter-stage">Ver por grupo</label>
+            <select id="lead-filter-stage">
+              <option value="">Todas las personas</option>
+              <option value="nuevo_lead">Recién registradas</option>
+              <option value="leyendo_libro">Leyendo el libro</option>
+              <option value="en_escuela">Estudiando en la Escuela</option>
+              <option value="comprador_verificado">Ya compraron / reseñaron</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Estado actual</th>
+                <th>Contacto directo</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 22px;">
+        <h2>Resumen de Ventas</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha / Período</th>
+                <th>Libros vendidos</th>
+                <th>Ingresos ($ USD)</th>
+              </tr>
+            </thead>
+            <tbody id="sales-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Publicidad en Amazon (Piloto Automático)</h2>
+        <p class="muted">
+          Una vez activada la campaña con tu tarjeta, Amazon muestra tu libro automáticamente las 24 horas. Si algún día quieres agregar o pausar presupuesto directamente en Amazon, usa este botón:
+        </p>
+        <div class="btn-row">
+          <a class="btn btn-accent" target="_blank" rel="noopener" href="https://advertising.amazon.com/cm/campaigns">
+            Abrir mi Presupuesto en Amazon
+          </a>
+          <a class="btn btn-outline" target="_blank" rel="noopener" href="https://www.amazon.com/dp/B09QN8HTQQ">
+            Ver Libro (Español)
+          </a>
+          <a class="btn btn-outline" target="_blank" rel="noopener" href="https://www.amazon.com/dp/B09XZHFXDK">
+            Ver Libro (Inglés)
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: TUS CLASES -->
+    <section id="tab-clases" class="tab-panel" role="tabpanel" hidden>
+      <div class="card">
+        <h2>Clases de la Escuela (Basadas en tu libro)</h2>
+        <p class="muted">
+          Cada bloque corresponde a un capítulo de <em>Auto Sanación</em>. Si grabas un video nuevo en YouTube, solo pégalo aquí y guarda.
+        </p>
+        <div id="lessons-editor"></div>
+      </div>
+    </section>
+
+    <!-- ZONA TECNICA OCULTA POR DEFECTO (PARA EL HIJO) -->
+    <details class="card-soft" style="margin-top: 32px;">
+      <summary style="cursor: pointer; font-weight: 800; font-size: 1.05rem; color: var(--primary);">
+        Configuración Técnica y Piloto Automático (Solo para tu hijo / administrador)
+      </summary>
+
+      <div class="grid-2" style="margin-top: 20px;">
+        <div class="card">
+          <h3>Piloto Automático: Correos y Redes</h3>
+          <p id="autopilot-status-text" class="muted">Verificando estado...</p>
+          <div class="btn-row" style="margin-bottom: 14px;">
+            <button id="dispatch-btn" class="btn btn-primary" type="button">Enviar correos / posts pendientes ahora</button>
+            <a class="btn btn-outline" href="/api/leads/export.csv">Descargar Excel de Leads</a>
+          </div>
+          <div id="outbox-list" style="max-height: 240px; overflow-y: auto; font-size: 0.9rem;"></div>
+        </div>
+
+        <div class="card">
+          <h3>Configuración WhatsApp y Amazon</h3>
+          <form id="config-form">
+            <div class="form-group">
+              <label for="cfg-wa">WhatsApp de Francis (ej. +573001234567)</label>
+              <input id="cfg-wa" type="text" placeholder="+573001234567" />
+            </div>
+            <div class="form-group">
+              <label for="cfg-domain">Tienda principal de Amazon</label>
+              <select id="cfg-domain">
+                <option value="amazon.com">Amazon.com (EE.UU. / Internacional)</option>
+                <option value="amazon.es">Amazon.es (España)</option>
+                <option value="amazon.com.mx">Amazon.com.mx (México)</option>
+              </select>
+            </div>
+            <div class="grid-3">
+              <div class="form-group">
+                <label for="cfg-paper">ASIN Tapa Blanda</label>
+                <input id="cfg-paper" type="text" placeholder="B0..." />
+              </div>
+              <div class="form-group">
+                <label for="cfg-kindle">ASIN Kindle</label>
+                <input id="cfg-kindle" type="text" placeholder="B0..." />
+              </div>
+              <div class="form-group">
+                <label for="cfg-audible">ASIN Audible</label>
+                <input id="cfg-audible" type="text" placeholder="B0..." />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-accent" style="width:100%;">Guardar Configuración</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Subir Reportes CSV de Amazon KDP / Ads</h3>
+          <form id="reports-form">
+            <div class="form-group">
+              <label for="rep-period">Nombre del período</label>
+              <input id="rep-period" type="text" value="Reporte Semanal Amazon" />
+            </div>
+            <div class="form-group">
+              <label for="rep-kdp-file">CSV de Ventas KDP</label>
+              <input id="rep-kdp-file" type="file" accept=".csv,text/csv" />
+            </div>
+            <div class="form-group">
+              <label for="rep-ads-file">CSV Términos de Búsqueda Amazon Ads</label>
+              <input id="rep-ads-file" type="file" accept=".csv,text/csv" />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Analizar Reportes</button>
+          </form>
+          <div id="reports-result" class="card-soft" hidden style="margin-top: 12px;"></div>
+        </div>
+
+        <div class="card">
+          <h3>Registrar Venta Rápida</h3>
+          <form id="manual-sale-form">
+            <div class="form-group">
+              <label for="sale-period">Fecha o semana</label>
+              <input id="sale-period" type="text" required placeholder="Ej. Semana 14 Nov" />
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="sale-units">Unidades vendidas</label>
+                <input id="sale-units" type="number" min="0" value="0" required />
+              </div>
+              <div class="form-group">
+                <label for="sale-royalty">Ingresos ($ USD)</label>
+                <input id="sale-royalty" type="number" step="0.01" min="0" value="0" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-accent" style="width:100%;">Guardar Venta</button>
+          </form>
+        </div>
+      </div>
+    </details>
+  </main>
+
+  <script src="/static/common.js"></script>
+  <script>
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.setAttribute("aria-selected", "false"));
+        document.querySelectorAll(".tab-panel").forEach((p) => (p.hidden = true));
+        btn.setAttribute("aria-selected", "true");
+        document.getElementById(btn.dataset.tab).hidden = false;
+      });
+    });
+
+    async function loadDashboard() {
+      const dash = await apiRequest("/api/dashboard");
+      const m = dash.metrics;
+      document.getElementById("kpi-pending").textContent = m.pending_feedback;
+      document.getElementById("kpi-students").textContent = `Alumnos en tu Escuela: ${m.students_count}`;
+      document.getElementById("kpi-leads").textContent = m.total_leads;
+      document.getElementById("kpi-leads-today").textContent = `Nuevas hoy: ${m.leads_today}`;
+      document.getElementById("kpi-units").textContent = m.total_units;
+      document.getElementById("kpi-royalty").textContent = `Ingresos acumulados: $${m.total_royalty_usd.toFixed(2)}`;
+    }
+
+    async function loadReflectionsAndLessons() {
+      const [refs, school] = await Promise.all([apiRequest("/api/admin/reflections"), apiRequest("/api/school")]);
+      const reflBox = document.getElementById("reflections-list");
+      reflBox.innerHTML = refs.reflections.length
+        ? refs.reflections
+            .map(
+              (r) => `
+            <div class="card-soft" style="margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                <strong style="font-size:1.15rem;">${escapeHtml(r.student_name)}</strong>
+                <span class="status-badge ${r.francis_feedback ? "status-ok" : "status-warn"}">
+                  ${escapeHtml(r.chapter_ref)} · ${r.francis_feedback ? "Respondido" : "Pendiente de tu respuesta"}
+                </span>
+              </div>
+              <p style="margin-top:0;"><strong>Clase:</strong> ${escapeHtml(r.lesson_title)}</p>
+              <p style="background:#fff; padding:12px; border-radius:10px; border:1px solid var(--border);">
+                "${escapeHtml(r.reflection_text || "(Completó la clase sin dejar comentario)")}"
+              </p>
+              <div class="form-group">
+                <label for="fb-${r.progress_id}">Tu mensaje para ${escapeHtml(r.student_name)}:</label>
+                <textarea id="fb-${r.progress_id}" placeholder="Escríbele aquí tu respuesta o consejo...">${escapeHtml(r.francis_feedback || "")}</textarea>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" type="button" onclick="sendFeedback(${r.progress_id})">Guardar mi respuesta</button>
+                ${
+                  r.student_whatsapp
+                    ? `<a class="btn btn-whatsapp" target="_blank" rel="noopener" href="https://wa.me/${escapeHtml(r.student_whatsapp.replace(/[^\d]/g, ""))}">Escribirle por WhatsApp</a>`
+                    : ""
+                }
+              </div>
+            </div>
+          `
+            )
+            .join("")
+        : `<p class="muted">Todavía no hay mensajes nuevos de alumnos. Apenas alguien complete un ejercicio en la Escuela aparecerá aquí.</p>`;
+
+      document.getElementById("lessons-editor").innerHTML = school.modules
+        .map(
+          (m) => `
+          <div class="card-soft" style="margin-bottom:16px;">
+            <h3>${escapeHtml(m.chapter_ref)}: ${escapeHtml(m.title)}</h3>
+            ${(m.lessons || [])
+              .map(
+                (l) => `
+              <div class="card" style="margin-top:10px; padding:16px;">
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label for="lt-${l.id}">Nombre de la clase</label>
+                    <input id="lt-${l.id}" type="text" value="${escapeHtml(l.title)}" />
+                  </div>
+                  <div class="form-group">
+                    <label for="lv-${l.id}">Link de tu video (opcional)</label>
+                    <input id="lv-${l.id}" type="url" value="${escapeHtml(l.video_url)}" placeholder="https://www.youtube.com/watch?v=..." />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="le-${l.id}">Pregunta o ejercicio para tus alumnos</label>
+                  <textarea id="le-${l.id}">${escapeHtml(l.exercise_prompt)}</textarea>
+                </div>
+                <button class="btn btn-accent" type="button" onclick="saveLessonEdit(${l.id})">Guardar cambios de esta clase</button>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    async function sendFeedback(progressId) {
+      const feedback = document.getElementById(`fb-${progressId}`).value;
+      await apiRequest("/api/admin/reflections/feedback", {
+        method: "POST",
+        body: JSON.stringify({ progress_id: progressId, feedback }),
+      });
+      showToast("¡Respuesta guardada! Tu alumno ya puede leerla.");
+      await Promise.all([loadDashboard(), loadReflectionsAndLessons()]);
+    }
+
+    async function saveLessonEdit(lessonId) {
+      await apiRequest(`/api/school/lessons/${lessonId}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: document.getElementById(`lt-${lessonId}`).value,
+          video_url: document.getElementById(`lv-${lessonId}`).value,
+          exercise_prompt: document.getElementById(`le-${lessonId}`).value,
+        }),
+      });
+      showToast("¡Clase guardada!");
+    }
+
+    async function loadLeads() {
+      const search = document.getElementById("lead-search").value;
+      const stage = document.getElementById("lead-filter-stage").value;
+      const data = await apiRequest(`/api/leads?search=${encodeURIComponent(search)}&stage=${encodeURIComponent(stage)}`);
+      document.getElementById("leads-tbody").innerHTML = data.leads.length
+        ? data.leads
+            .map(
+              (l) => `
+            <tr>
+              <td><strong>${escapeHtml(l.name)}</strong><br/><span class="muted">${escapeHtml(l.email)}</span></td>
+              <td>
+                <select aria-label="Estado de ${escapeHtml(l.name)}" onchange="changeLeadStage(${l.id}, this.value)">
+                  <option value="nuevo_lead" ${l.stage === "nuevo_lead" ? "selected" : ""}>Recién registrada</option>
+                  <option value="leyendo_libro" ${l.stage === "leyendo_libro" ? "selected" : ""}>Leyendo el libro</option>
+                  <option value="en_escuela" ${l.stage === "en_escuela" ? "selected" : ""}>En la Escuela</option>
+                  <option value="comprador_verificado" ${l.stage === "comprador_verificado" ? "selected" : ""}>Compró / Reseñó</option>
+                </select>
+              </td>
+              <td>
+                ${
+                  l.whatsapp_chat_url
+                    ? `<a class="btn btn-whatsapp" target="_blank" rel="noopener" href="${escapeHtml(l.whatsapp_chat_url)}">Escribir por WhatsApp</a>`
+                    : `<span class="muted">Sin WhatsApp</span>`
+                }
+              </td>
+            </tr>
+          `
+            )
+            .join("")
+        : `<tr><td colspan="3" class="muted">Aún no hay personas registradas aquí.</td></tr>`;
+    }
+
+    async function changeLeadStage(leadId, stage) {
+      await apiRequest(`/api/leads/${leadId}`, { method: "PATCH", body: JSON.stringify({ stage }) });
+      showToast("Estado actualizado.");
+    }
+
+    async function loadSales() {
+      const data = await apiRequest("/api/sales");
+      document.getElementById("sales-tbody").innerHTML = data.sales.length
+        ? data.sales
+            .map(
+              (s) => `
+            <tr>
+              <td>${escapeHtml(s.period_label)}</td>
+              <td>${s.units}</td>
+              <td>$${Number(s.royalty_usd).toFixed(2)}</td>
+            </tr>
+          `
+            )
+            .join("")
+        : `<tr><td colspan="3" class="muted">Aún no hay ventas registradas.</td></tr>`;
+    }
+
+    async function loadOutbox() {
+      const data = await apiRequest("/api/admin/outbox");
+      const st = data.config_status;
+      document.getElementById("autopilot-status-text").textContent =
+        `Correo automático (SMTP): ${st.smtp_ready ? "Conectado" : "Falta configurar en .env"} · ` +
+        `Redes (Webhook): ${st.social_webhook_ready ? "Conectado" : "Falta configurar en .env"}`;
+      document.getElementById("outbox-list").innerHTML = (data.jobs || []).length
+        ? data.jobs
+            .slice(0, 15)
+            .map(
+              (j) => `<div style="padding:6px 0; border-bottom:1px solid var(--border);">
+                <strong>[${escapeHtml(j.status)}]</strong> ${escapeHtml(j.channel)} → ${escapeHtml(j.recipient || "Redes")}: ${escapeHtml(j.subject)}
+              </div>`
+            )
+            .join("")
+        : `<p class="muted">La cola está vacía. Al registrarse una persona se crean sus correos de seguimiento automáticamente.</p>`;
+    }
+
+    async function loadConfigForm() {
+      const data = await apiRequest("/api/config");
+      const s = data.settings;
+      document.getElementById("cfg-wa").value = s.whatsapp_number || "";
+      document.getElementById("cfg-domain").value = s.amazon_domain || "amazon.com";
+      document.getElementById("cfg-paper").value = s.asin_paperback || "";
+      document.getElementById("cfg-kindle").value = s.asin_kindle || "";
+      document.getElementById("cfg-audible").value = s.asin_audible || "";
+    }
+
+    document.getElementById("lead-search").addEventListener("input", loadLeads);
+    document.getElementById("lead-filter-stage").addEventListener("change", loadLeads);
+
+    document.getElementById("dispatch-btn").addEventListener("click", async () => {
+      const res = await apiRequest("/api/admin/outbox/dispatch", { method: "POST", body: "{}" });
+      showToast(`Enviados: ${res.sent} · Pendientes sin credenciales: ${res.skipped_missing_credentials}`);
+      loadOutbox();
+    });
+
+    document.getElementById("config-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await apiRequest("/api/config", {
+        method: "POST",
+        body: JSON.stringify({
+          whatsapp_number: document.getElementById("cfg-wa").value,
+          amazon_domain: document.getElementById("cfg-domain").value,
+          asin_paperback: document.getElementById("cfg-paper").value,
+          asin_kindle: document.getElementById("cfg-kindle").value,
+          asin_audible: document.getElementById("cfg-audible").value,
+        }),
+      });
+      showToast("Configuración guardada.");
+      loadLeads();
+    });
+
+    document.getElementById("manual-sale-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await apiRequest("/api/sales", {
+        method: "POST",
+        body: JSON.stringify({
+          period_label: document.getElementById("sale-period").value,
+          units: Number(document.getElementById("sale-units").value),
+          royalty_usd: Number(document.getElementById("sale-royalty").value),
+          marketplace: "Amazon (Manual)",
+        }),
+      });
+      showToast("Venta guardada.");
+      await Promise.all([loadSales(), loadDashboard()]);
+    });
+
+    document.getElementById("reports-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const kdpFile = document.getElementById("rep-kdp-file").files[0];
+      const adsFile = document.getElementById("rep-ads-file").files[0];
+      const res = await apiRequest("/api/admin/import-reports", {
+        method: "POST",
+        body: JSON.stringify({
+          period_label: document.getElementById("rep-period").value,
+          kdp_csv: kdpFile ? await kdpFile.text() : "",
+          ads_csv: adsFile ? await adsFile.text() : "",
+        }),
+      });
+      const box = document.getElementById("reports-result");
+      box.hidden = false;
+      box.innerHTML = `<p style="margin:0;"><strong>Listo.</strong> ${res.has_negatives_csv ? `<a href="/api/admin/bulk-negatives.csv">Descargar Palabras Negativas CSV</a>` : ""}</p>`;
+      await Promise.all([loadSales(), loadDashboard()]);
+      showToast("Reportes procesados.");
+    });
+
+    Promise.all([loadDashboard(), loadReflectionsAndLessons(), loadLeads(), loadSales(), loadOutbox(), loadConfigForm()]).catch((err) =>
+      showToast(err.message)
+    );
+  </script>
+</body>
+</html>

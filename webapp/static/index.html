@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto Sanación — Libro y Escuela de Francis Jaramillo</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-badge">AS</span>
+        <span>Auto Sanación · Francis Jaramillo</span>
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a class="nav-link active" href="/">Libro</a>
+        <a class="nav-link" href="/escuela">Escuela del Libro</a>
+        <a class="nav-link" href="/qr/contacto">QR Contacto Directo</a>
+        <a class="nav-link" href="/admin">Panel de Francis</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <span class="pill">Best Seller en Amazon · Psicología y Medicina Integrativa</span>
+          <h1>AUTO SANACIÓN: Descubre cómo tu cuerpo tiene los recursos para sanar</h1>
+          <p class="subtitle">
+            Una guía práctica y testimonio real de la psicóloga y terapeuta integrativa
+            <strong>Francis Jaramillo</strong>. El libro es la columna vertebral; nuestra
+            <strong>Escuela interactiva</strong> te acompaña paso a paso en cada capítulo.
+          </p>
+
+          <div class="card-soft" style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">Consigue el libro en Amazon (24/7)</h3>
+            <div class="btn-row">
+              <a id="buy-paperback" class="btn btn-primary" target="_blank" rel="noopener" href="#">Auto Sanación (Español)</a>
+              <a id="buy-english" class="btn btn-accent" target="_blank" rel="noopener" href="#">Self-Healing (English)</a>
+              <a id="buy-audible" class="btn btn-outline" target="_blank" rel="noopener" href="#">Audiolibro (Audible)</a>
+            </div>
+            <p class="muted" style="margin-bottom: 0; font-size: 0.92rem;">
+              ISBN-13: 979-8403609579 · Compra segura directamente en Amazon.
+            </p>
+          </div>
+
+          <div class="btn-row">
+            <a class="btn btn-outline" href="/escuela">Ya tengo el libro: entrar a la Escuela</a>
+            <a id="wa-direct" class="btn btn-whatsapp" target="_blank" rel="noopener" href="#">Hablar con Francis por WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Accede gratis a la Clase 1 + Guía "Pausa Integrativa"</h2>
+          <p class="muted">
+            Regístrate para desbloquear el primer módulo de la Escuela, recibir herramientas
+            prácticas semanales y hacer seguimiento de tu proceso con Francis.
+          </p>
+          <form id="lead-form">
+            <div class="form-group">
+              <label for="lead-name">Tu nombre completo</label>
+              <input id="lead-name" name="name" type="text" required placeholder="Ej. María Gómez" />
+            </div>
+            <div class="form-group">
+              <label for="lead-email">Tu correo electrónico</label>
+              <input id="lead-email" name="email" type="email" required placeholder="maria@correo.com" />
+            </div>
+            <div class="form-group">
+              <label for="lead-wa">Tu WhatsApp (opcional, para acompañamiento)</label>
+              <input id="lead-wa" name="whatsapp" type="tel" placeholder="+57 300 000 0000" />
+            </div>
+            <div class="form-group">
+              <label for="lead-stage">¿En qué etapa estás hoy?</label>
+              <select id="lead-stage" name="stage">
+                <option value="nuevo_lead">Quiero conocer el libro y recibir la guía gratis</option>
+                <option value="leyendo_libro">Ya compré / estoy leyendo el libro</option>
+                <option value="en_escuela">Quiero entrar directamente a la Escuela</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              Entrar a la Escuela y Desbloquear Guía
+            </button>
+          </form>
+          <div id="lead-success" class="card-soft" hidden style="margin-top: 16px;">
+            <p style="margin-top: 0; font-weight: 700; color: var(--ok);">
+              ¡Registro guardado! Tu acceso a la Escuela Auto Sanación ya está listo.
+            </p>
+            <a id="enter-school-btn" class="btn btn-primary" href="/escuela" style="width: 100%;">
+              Ir a mi primera clase ahora
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>La Columna Vertebral: Libro + Clases + Acompañamiento</h2>
+      <p class="subtitle">
+        Cada módulo de la Escuela profundiza un capítulo del libro con ejercicios prácticos
+        y contacto directo mediante los códigos QR inteligentes.
+      </p>
+      <div id="modules-preview" class="grid-3"></div>
+    </section>
+  </main>
+
+  <script src="/static/common.js"></script>
+  <script>
+    async function initLanding() {
+      const cfg = await apiRequest("/api/config");
+      document.getElementById("buy-paperback").href = cfg.amazon_urls.paperback_url;
+      document.getElementById("buy-english").href = cfg.amazon_urls.english_url;
+      document.getElementById("buy-audible").href = cfg.amazon_urls.audible_url;
+      document.getElementById("wa-direct").href = cfg.whatsapp_direct_url;
+
+      const school = await apiRequest("/api/school");
+      const container = document.getElementById("modules-preview");
+      container.innerHTML = school.modules
+        .map(
+          (m) => `
+          <article class="card">
+            <span class="status-badge status-ok">${escapeHtml(m.chapter_ref)}</span>
+            <h3 style="margin-top: 10px;">${escapeHtml(m.title)}</h3>
+            <p class="muted">${escapeHtml(m.subtitle)}</p>
+            <p style="font-size: 0.94rem;">${escapeHtml(m.description)}</p>
+            <div class="btn-row">
+              <a class="btn btn-outline" href="/escuela?module=${m.id}">Ver clase</a>
+              <a class="btn btn-outline" href="/qr/${escapeHtml(m.qr_slug)}">QR del capítulo</a>
+            </div>
+          </article>
+        `
+        )
+        .join("");
+    }
+
+    document.getElementById("lead-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById("lead-name").value,
+        email: document.getElementById("lead-email").value,
+        whatsapp: document.getElementById("lead-wa").value,
+        stage: document.getElementById("lead-stage").value,
+        source: "landing",
+      };
+      try {
+        await apiRequest("/api/leads", { method: "POST", body: JSON.stringify(payload) });
+        localStorage.setItem("autosanacion_student_email", payload.email.trim().toLowerCase());
+        localStorage.setItem("autosanacion_student_name", payload.name.trim());
+        document.getElementById("lead-success").hidden = false;
+        showToast("¡Bienvenido(a)! Acceso habilitado.");
+      } catch (err) {
+        showToast(err.message);
+      }
+    });
+
+    initLanding().catch((err) => showToast(err.message));
+  </script>
+</body>
+</html>
